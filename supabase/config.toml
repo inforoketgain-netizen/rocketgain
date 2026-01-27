@@ -1,0 +1,7 @@
+project_id = "hveuckegwmycpczrxyxr"
+
+[functions.send-transaction-email]
+verify_jwt = false
+
+[functions.notify-admin]
+verify_jwt = false
