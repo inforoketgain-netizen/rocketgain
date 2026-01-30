@@ -32,6 +32,8 @@ import AdminStatistics from "./pages/admin/AdminStatistics";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminPaymentMethods from "./pages/admin/AdminPaymentMethods";
+import AuthCallback from "./pages/AuthCallback";
+
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,8 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+
             
             {/* Protected dashboard routes */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
