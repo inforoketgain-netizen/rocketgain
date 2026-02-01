@@ -20,7 +20,7 @@ const Referral = () => {
 
   // Use referral code from profile or generate from user id
   const referralCode = profile?.referral_code || user?.id?.slice(0, 8).toUpperCase() || "XXXXXX";
-  const referralLink = `https://rocketgain.com/ref/${referralCode}`;
+  const referralLink = `https://rocketgain.io/ref/${referralCode}`;
   
   const stats = {
     totalReferrals,
