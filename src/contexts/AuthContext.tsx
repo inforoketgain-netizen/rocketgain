@@ -6,7 +6,13 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (
+  email: string,
+  password: string,
+  fullName: string,
+  referrerId?: string | null
+) => Promise<{ error: Error | null }>;
+
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -46,22 +52,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: "https://rocketgain.vercel.app/auth/callback",
-        data: {
-          full_name: fullName,
-        },
+  const signUp = async (
+  email: string,
+  password: string,
+  fullName: string,
+  referrerId?: string | null
+) => {
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      data: {
+        full_name: fullName,
+        referrer_id: referrerId ?? null,
       },
-    });
-    
-    return { error: error as Error | null };
-  };
+    },
+  });
+
+  return { error: error as Error | null };
+};
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

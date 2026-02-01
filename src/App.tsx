@@ -33,6 +33,8 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminPaymentMethods from "./pages/admin/AdminPaymentMethods";
 import AuthCallback from "./pages/AuthCallback";
+import ReferralLanding from "./pages/ReferralLanding";
+import ReferralRedirect from "./pages/ReferralRedirect";
 
 
 const queryClient = new QueryClient();
@@ -56,6 +58,11 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+
+            {/* Referral route */}
+            <Route path="/ref/:code" element={<ReferralLanding />} />
+            <Route path="/ref/:code" element={<ReferralRedirect />} />
+
 
             
             {/* Protected dashboard routes */}

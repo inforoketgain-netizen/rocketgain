@@ -27,6 +27,8 @@ const Auth = () => {
     confirmPassword: "",
   });
   const [resetEmail, setResetEmail] = useState("");
+  const [referrer, setReferrer] = useState<string | null>(null);
+
 
   const passwordValidation = useMemo(() => validatePassword(formData.password), [formData.password]);
 
@@ -36,6 +38,15 @@ const Auth = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+  const ref = searchParams.get("ref");
+  if (ref) {
+    setReferrer(ref);
+    localStorage.setItem("referrer_id", ref); // on garde même si la personne quitte la page
+  }
+}, [searchParams]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,76 +101,53 @@ if (mode === "signup") {
     }
 
     try {
-      if (mode === "signup") {
-        const { error } = await signUp(formData.email, formData.password, formData.name);
-        
-        if (error) {
-          if (error.message.includes("already registered")) {
-            toast({
-              title: "Erreur",
-              description: "Cet email est déjà utilisé. Essayez de vous connecter.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Erreur",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-        } else {
-  toast({
-    title: "Compte créé",
-    description: "Un email de confirmation t’a été envoyé. Confirme avant de te connecter.",
-  });
-  setMode("login");
-}
+  if (mode === "signup") {
+    const storedReferrer = localStorage.getItem("referrer_id");
 
-      } else {
-        const { error } = await signIn(formData.email, formData.password);
-        
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            toast({
-              title: "Erreur",
-              description: "Email ou mot de passe incorrect.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Erreur",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-        } else {
-  const { data } = await supabase.auth.getUser();
+    const { error } = await signUp(
+      formData.email,
+      formData.password,
+      formData.name,
+      storedReferrer // 👈 ID du parrain envoyé ici
+    );
 
-  if (!data.user?.email_confirmed_at) {
-    toast({
-      title: "Email non confirmé",
-      description: "Vérifie ta boîte mail avant de te connecter.",
-      variant: "destructive",
-    });
-    return;
-  }
-
-  toast({
-    title: "Connexion réussie !",
-    description: "Redirection vers votre tableau de bord...",
-  });
-  navigate("/dashboard");
-}
-
-      }
-    } catch (error) {
+    if (error) {
       toast({
         title: "Erreur",
-        description: "Une erreur inattendue s'est produite.",
+        description: error.message,
         variant: "destructive",
       });
+    } else {
+      toast({
+        title: "Compte créé",
+        description: "Un email de confirmation t’a été envoyé.",
+      });
+      setMode("login");
     }
 
+  } else { // LOGIN
+    const { error } = await signIn(formData.email, formData.password);
+
+    if (error) {
+      toast({
+        title: "Erreur",
+        description: "Email ou mot de passe incorrect.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Connexion réussie !",
+      });
+      navigate("/dashboard");
+    }
+  }
+} catch (error) {
+  toast({
+    title: "Erreur",
+    description: "Une erreur inattendue s'est produite.",
+    variant: "destructive",
+  });
+} 
     setIsLoading(false);
   };
 
