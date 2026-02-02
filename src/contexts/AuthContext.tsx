@@ -10,7 +10,7 @@ interface AuthContextType {
   email: string,
   password: string,
   fullName: string,
-  referrerId?: string | null
+  // referrerId?: string | null
 ) => Promise<{ error: Error | null }>;
 
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -52,24 +52,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+  if (!user || !session) return;
+
+  const createProfile = async () => {
+    const referralCode = localStorage.getItem("referral_code");
+    let referrerId = null;
+
+    if (referralCode) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("own_referral_code", referralCode)
+        .single();
+
+      if (data) referrerId = data.user_id;
+    }
+
+    const profileData: any = {
+      user_id: user.id,
+      email: user.email,
+      full_name: user.user_metadata.full_name,
+    };
+
+    if (referrerId) {
+      profileData.referred_by = referrerId;
+    }
+
+    const { error } = await supabase.from("profiles").upsert(profileData);
+
+    if (!error) {
+
+    localStorage.removeItem("referral_code"); // nettoyage
+  } else {
+    console.error("PROFILE CREATION ERROR:", error.message);
+    }
+  };
+
+  createProfile();
+}, [user, session]);
+
   const signUp = async (
   email: string,
   password: string,
   fullName: string
-  
 ) => {
-
-  // 🔥 On récupère le code stocké par ReferralRedirect
-  const referralCode = localStorage.getItem("referral_code");
-
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
-        full_name: fullName,
-        referral_code: referralCode,
+        full_name: fullName, // ✅ seulement ça
       },
     },
   });
