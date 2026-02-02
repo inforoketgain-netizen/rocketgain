@@ -15,6 +15,7 @@ const ReferralRedirect = () => {
     navigate("/auth?mode=signup");
   }, [code, navigate]);
 
+  
   return null;
 };
 
