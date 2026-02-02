@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         full_name: fullName,
-        referrer_code: referralCode,
+        referral_code: referralCode,
       },
     },
   });
