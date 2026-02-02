@@ -8,7 +8,7 @@ const ReferralRedirect = () => {
   useEffect(() => {
     if (code) {
       // Sauvegarde du parrain
-      localStorage.setItem("referrer_id", code);
+      localStorage.setItem("referral_code", code);
     }
 
     // Redirection vers inscription
