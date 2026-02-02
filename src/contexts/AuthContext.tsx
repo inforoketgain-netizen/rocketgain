@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   if (!user || !session) return;
 
   const createProfile = async () => {
-    const referralCode = localStorage.getItem("referral_code");
+    const referralCode = localStorage.getItem("referrer_id");
     let referrerId = null;
 
     if (referralCode) {
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (!error) {
 
-    localStorage.removeItem("referral_code"); // nettoyage
+    localStorage.removeItem("referrer_id"); // nettoyage
   } else {
     console.error("PROFILE CREATION ERROR:", error.message);
     }
