@@ -63,9 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from("profiles")
         .select("user_id")
-        .eq("own_referral_code", referralCode)
-        .maybeSingle(); // ✅ bonne méthode
-
+        .or(`own_referral_code.eq.${referralCode},referral_code.eq.${referralCode}`)
+        .maybeSingle();
+        
       if (error) {
         console.error("REFERRAL SEARCH ERROR:", error.message);
       }
