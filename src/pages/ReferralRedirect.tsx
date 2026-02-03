@@ -9,6 +9,8 @@ const ReferralRedirect = () => {
     if (code) {
       // Sauvegarde du parrain
       localStorage.setItem("referral_code", code);
+
+      console.log("Code parrain sauvegardé :", code);
     }
 
     // Redirection vers inscription
