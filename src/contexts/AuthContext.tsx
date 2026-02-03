@@ -60,13 +60,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let referrerId = null;
 
     if (referralCode) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("user_id")
         .eq("own_referral_code", referralCode)
-        .single();
+        .maybeSingle(); // ✅ bonne méthode
 
-      if (data) referrerId = data.user_id;
+      if (error) {
+        console.error("REFERRAL SEARCH ERROR:", error.message);
+      }
+
+      if (data) {
+        referrerId = data.user_id;
+        console.log("PARRAIN TROUVÉ:", referrerId);
+      } else {
+        console.log("AUCUN PARRAIN TROUVÉ POUR LE CODE:", referralCode);
+      }
     }
 
     const profileData: any = {
@@ -79,13 +88,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       profileData.referred_by = referrerId;
     }
 
-    const { error } = await supabase.from("profiles").upsert(profileData);
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .upsert(profileData);
 
-    if (!error) {
-
-    localStorage.removeItem("referrer_id"); // nettoyage
-  } else {
-    console.error("PROFILE CREATION ERROR:", error.message);
+    if (profileError) {
+      console.error("PROFILE CREATION ERROR:", profileError.message);
+    } else {
+      console.log("PROFILE CREATED:", profileData);
+      localStorage.removeItem("referrer_id"); // nettoyage
     }
   };
 
