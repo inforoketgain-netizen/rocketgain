@@ -56,16 +56,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   if (!user || !session) return;
 
   const createProfile = async () => {
-    const referralCode = localStorage.getItem("referrer_id");
+    const referralCode = user.user_metadata?.referral_code || null;
+    console.log("CODE PARRAIN DANS METADATA:", referralCode);
     let referrerId = null;
 
     if (referralCode) {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("user_id")
-        .or(`own_referral_code.eq.${referralCode},referral_code.eq.${referralCode}`)
-        .maybeSingle();
-        
+  .from("profiles")
+  .select("user_id")
+  .eq("own_referral_code", referralCode)
+  .maybeSingle();
+
       if (error) {
         console.error("REFERRAL SEARCH ERROR:", error.message);
       }
