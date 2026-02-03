@@ -97,6 +97,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   password: string,
   fullName: string
 ) => {
+
+  const referralCode = localStorage.getItem("referrer_id");
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -104,6 +107,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         full_name: fullName, // ✅ seulement ça
+
+        referral_code: referralCode || null,
+
       },
     },
   });
