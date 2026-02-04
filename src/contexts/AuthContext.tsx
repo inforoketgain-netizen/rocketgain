@@ -68,7 +68,7 @@ console.log("CODE PARRAIN FINAL UTILISÉ :", referralCode);
       const { data, error } = await supabase
   .from("profiles")
   .select("user_id")
-  .or(`own_referral_code.eq.${referralCode},referral_code.eq.${referralCode}`)
+  .eq("referral_code",referralCode)
   .maybeSingle();
 
       if (error) {
