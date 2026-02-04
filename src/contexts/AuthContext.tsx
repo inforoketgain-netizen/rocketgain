@@ -55,55 +55,109 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
   if (!user || !session) return;
 
-  const createProfile = async () => {
-    const referralCode =
-  user.user_metadata?.referral_code ||
-  localStorage.getItem("referrer_id") ||
-  null;
+//   const createProfile = async () => {
+//     const referralCode =
+//   user.user_metadata?.referral_code ||
+//   localStorage.getItem("referrer_id") ||
+//   null;
 
-console.log("CODE PARRAIN FINAL UTILISÉ :", referralCode);
-    let referrerId = null;
+// console.log("CODE PARRAIN FINAL UTILISÉ :", referralCode);
+//     let referrerId = null;
 
-    if (referralCode) {
-      const { data, error } = await supabase
-  .from("profiles")
-  .select("user_id")
-  .eq("own_referral_code",referralCode)
-  .maybeSingle();
+//     if (referralCode) {
+//       const { data, error } = await supabase
+//   .from("profiles")
+//   .select("user_id")
+//   .eq("own_referral_code",referralCode)
+//   .maybeSingle();
 
-      if (error) {
-        console.error("REFERRAL SEARCH ERROR:", error.message);
-      }
+//       if (error) {
+//         console.error("REFERRAL SEARCH ERROR:", error.message);
+//       }
 
-      if (data) {
-        referrerId = data.user_id;
-        console.log("PARRAIN TROUVÉ:", referrerId);
-      } else {
-        console.log("AUCUN PARRAIN TROUVÉ POUR LE CODE:", referralCode);
-      }
-    }
+//       if (data) {
+//         referrerId = data.user_id;
+//         console.log("PARRAIN TROUVÉ:", referrerId);
+//       } else {
+//         console.log("AUCUN PARRAIN TROUVÉ POUR LE CODE:", referralCode);
+//       }
+//     }
 
-    const profileData: any = {
-      user_id: user.id,
-      email: user.email,
-      full_name: user.user_metadata.full_name,
-    };
+//     const profileData: any = {
+//       user_id: user.id,
+//       email: user.email,
+//       full_name: user.user_metadata.full_name,
+//     };
 
-    if (referrerId) {
-      profileData.referred_by = referrerId;
-    }
+//     if (referrerId) {
+//       profileData.referred_by = referrerId;
+//     }
 
-    const { error: profileError } = await supabase
+//     const { error: profileError } = await supabase
+//       .from("profiles")
+//       .insert(profileData);
+
+//     if (profileError) {
+//       console.error("PROFILE CREATION ERROR:", profileError.message);
+//     } else {
+//       console.log("PROFILE CREATED:", profileData);
+//       localStorage.removeItem("referrer_id"); // nettoyage
+//     }
+//   };
+
+const createProfile = async () => {
+  // 🔍 Vérifie si le profil existe déjà
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existingProfile) {
+    console.log("PROFILE EXISTE DÉJÀ");
+    return;
+  }
+
+  const referralCode =
+    user.user_metadata?.referral_code ||
+    localStorage.getItem("referrer_id") ||
+    null;
+
+  console.log("CODE PARRAIN FINAL UTILISÉ :", referralCode);
+
+  let referrerId = null;
+
+  if (referralCode) {
+    const { data } = await supabase
       .from("profiles")
-      .insert(profileData);
+      .select("user_id")
+      .eq("referral_code", referralCode)
+      .maybeSingle();
 
-    if (profileError) {
-      console.error("PROFILE CREATION ERROR:", profileError.message);
+    if (data) {
+      referrerId = data.user_id;
+      console.log("PARRAIN TROUVÉ:", referrerId);
     } else {
-      console.log("PROFILE CREATED:", profileData);
-      localStorage.removeItem("referrer_id"); // nettoyage
+      console.log("AUCUN PARRAIN TROUVÉ POUR LE CODE:", referralCode);
     }
+  }
+
+  const profileData: any = {
+    user_id: user.id,
+    email: user.email,
+    full_name: user.user_metadata.full_name,
+    referred_by: referrerId,
   };
+
+  const { error } = await supabase.from("profiles").insert(profileData);
+
+  if (error) {
+    console.error("PROFILE CREATION ERROR:", error.message);
+  } else {
+    console.log("PROFILE CREATED:", profileData);
+    localStorage.removeItem("referrer_id");
+  }
+};
 
   createProfile();
 }, [user, session]);

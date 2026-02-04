@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Rocket } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,6 +51,7 @@ const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher variant="compact" />
             <Link to="/auth">
               <Button variant="ghost" size="sm">
                 Connexion
@@ -90,6 +92,7 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="flex gap-2 mt-4 px-4">
+                <LanguageSwitcher variant="compact" />
                 <Link to="/auth" className="flex-1" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" className="w-full">
                     Connexion

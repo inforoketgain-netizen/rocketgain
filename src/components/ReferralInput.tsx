@@ -12,11 +12,11 @@ export default function ReferralInput({ onSuccess }: { onSuccess: () => void }) 
 
     setLoading(true);
 
-    // Cherche le parrain via son own_referral_code
+    // Cherche le parrain via son referral_code
     const { data: referrer } = await supabase
       .from("profiles")
       .select("user_id")
-      .eq("own_referral_code", code)
+      .eq("referral_code", code)
       .maybeSingle();
 
     if (!referrer) {
