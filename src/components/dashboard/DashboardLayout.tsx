@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -19,6 +19,9 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import ReferralInput from "@/components/ReferralInput";
+
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -38,8 +41,29 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { isAdmin } = useUserRole();
+  const [showReferralBox, setShowReferralBox] = useState(false);
+
+  useEffect(() => {
+  const checkReferral = async () => {
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("referred_by")
+      .eq("user_id", user.id)
+      .single();
+
+    const storedCode = localStorage.getItem("referrer_id");
+
+    if (!profile?.referred_by && storedCode) {
+      setShowReferralBox(true);
+    }
+  };
+
+  checkReferral();
+}, [user]);
 
   const handleLogout = async () => {
     await signOut();
@@ -147,9 +171,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8">
-          {children}
-        </main>
+        <main className="flex-1 p-4 lg:p-8 space-y-4">
+  {showReferralBox && (
+    <div className="bg-yellow-100 border border-yellow-400 p-4 rounded-lg">
+      <p className="font-semibold mb-2">Tu as été invité par un ami ?</p>
+      <ReferralInput onSuccess={() => setShowReferralBox(false)} />
+    </div>
+  )}
+
+  {children}
+</main>
       </div>
     </div>
   );

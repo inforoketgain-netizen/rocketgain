@@ -124,8 +124,6 @@ console.log("CODE PARRAIN FINAL UTILISÉ :", referralCode);
       data: {
         full_name: fullName, // ✅ seulement ça
 
-        ...(referralCode ? { referral_code: referralCode } : {})
-
       },
     },
   });
