@@ -95,7 +95,7 @@ console.log("CODE PARRAIN FINAL UTILISÉ :", referralCode);
 
     const { error: profileError } = await supabase
       .from("profiles")
-      .upsert(profileData);
+      .insert(profileData);
 
     if (profileError) {
       console.error("PROFILE CREATION ERROR:", profileError.message);

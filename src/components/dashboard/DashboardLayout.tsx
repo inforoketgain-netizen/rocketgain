@@ -179,7 +179,18 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     </div>
   )}
 
-  {children}
+  {showReferralBox ? (
+  <div className="flex items-center justify-center h-full">
+    <div className="bg-yellow-100 border border-yellow-400 p-6 rounded-lg w-full max-w-md">
+      <p className="font-semibold mb-3 text-center">
+        Entre ton code de parrainage pour activer ton compte
+      </p>
+      <ReferralInput onSuccess={() => setShowReferralBox(false)} />
+    </div>
+  </div>
+) : (
+  children
+)}
 </main>
       </div>
     </div>
